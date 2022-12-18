@@ -19,7 +19,7 @@ For this challenge I had to take a working Express.js API and configure it to us
 
 ## INSTALLATION:
 
-Simply run npm install within your node js and you will have all of the dependencies needed 
+After you clone the repo run npm install within your node js and you will have all of the dependencies needed.
 
 ## USAGE/INSTRUCTIONS:
 
