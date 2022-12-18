@@ -8,9 +8,9 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Product data
   try {
     const tagData = await Tag.findAll(
-    { include: [{
-      model: Product,}, { model: Tag, through: ProductTag,}
-    ],}
+      {
+        include: [{ model: Product, through: ProductTag, as: 'tagProducts' }],
+    }
     );
     res.status(200).json(tagData);
   } catch (err) {
@@ -22,15 +22,15 @@ router.get('/:id', async (req, res) => {
   // find a single tag by its `id`
   // be sure to include its associated Product data
   try {
-    const tagData = await Tag.findByPk(req.params.id, {
-        include: [{ model: Product, }, { model: Tag, through: ProductTag, }]
-    });
+    const tagID = await Tag.findByPk(req.params.id, {
+      include: [{ model: Product, through: ProductTag, as: 'tagProducts' }],
+  });
 
-    if (!tagData) {
+    if (!tagID) {
         res.status(404).json({ message: 'Error- No tag found with that id!' });
         return;
     }
-    res.status(200).json(tagData);
+    res.status(200).json(tagID);
 } catch (err) {
     res.status(500).json(err);
 }
@@ -48,28 +48,39 @@ router.post('/', (req, res) => {
     });
 }); 
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a tag's name by its `id` value
-  Tag.update(req.body, {
+  try {
+    const updateTag = await Tag.update({tag_name: req.body.tag_name,}, 
+      {
     where: {
       id: req.params.id
-    }
-  })
-    .then(tagData => {
-      if (!tagData){
-        res.status(404).json({message:'Error- No tag found with this id'});
-        return;
-      }
-      res.json(tagData);
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+    },
+  });
+  res.status(200).json(data);
+} catch (err) {
+  res.status(500).json(err);
+}
 });
 
-router.delete('/:id', (req, res) => {
-  // delete on tag by its `id` value
-});
+// router.delete('/:id', async (req, res) => {
+//   // delete a category by its `id` value
+//   try {
+//     const categoryDestroy = await Category.destroy({
+//       where: {
+//         id: req.params.id
+//       }
+//     });
+
+//     if (!categoryDestroy) {
+//       res.status(404).json({ message: 'No category found with this id!' });
+//       return;
+//     }
+
+//     res.status(200).json(categoryDestroy);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
 
 module.exports = router;
