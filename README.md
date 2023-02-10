@@ -25,8 +25,12 @@ After you clone the repo run npm install within your node js and you will have a
 
 1. npm install, 2. npm run seed, 3. node server.js, here is a video below: <br/>
 
-https://user-images.githubusercontent.com/107738986/205219254-b9ac3cf7-a4de-44fd-801f-8219fdf55d58.mp4
 
+
+
+
+
+https://user-images.githubusercontent.com/107738986/218056425-575126db-1abc-49de-8128-2a55bf285cbf.mp4
 
 
 
