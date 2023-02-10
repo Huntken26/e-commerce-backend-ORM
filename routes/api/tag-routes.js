@@ -2,85 +2,83 @@ const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
-
-router.get('/', async (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
-  try {
-    const tagData = await Tag.findAll(
-      {
-        include: [{ model: Product, through: ProductTag, as: 'tagProducts' }],
+  router.get('/', async(req, res) => {
+    try {
+        const tagData = await Tag.findAll({
+            include: [{ model: Product, through: ProductTag}],
+        });
+        res.status(200).json(tagData);
+    } catch (err) {
+        res.status(500).json(err);
     }
-    );
-    res.status(200).json(tagData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-router.get('/:id', async (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
-  try {
-    const tagID = await Tag.findByPk(req.params.id, {
-      include: [{ model: Product, through: ProductTag, as: 'tagProducts' }],
   });
-
-    if (!tagID) {
-        res.status(404).json({ message: 'Error- No tag found with that id!' });
-        return;
-    }
-    res.status(200).json(tagID);
-} catch (err) {
-    res.status(500).json(err);
-}
-});
-
-router.post('/', (req, res) => {
-  // create a new tag
-  Product.create({
-    tag_name: req.body.tag_name
-})
-.then(newtagData => res.json(newtagData))
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-}); 
-
-router.put('/:id', async (req, res) => {
-  // update a tag's name by its `id` value
-  try {
-    const updateTag = await Tag.update({tag_name: req.body.tag_name,}, 
-      {
-    where: {
-      id: req.params.id
-    },
-  });
-  res.status(200).json(data);
-} catch (err) {
-  res.status(500).json(err);
-}
-});
-
-// router.delete('/:id', async (req, res) => {
-//   // delete a category by its `id` value
 //   try {
-//     const categoryDestroy = await Category.destroy({
-//       where: {
-//         id: req.params.id
-//       }
+//     const rawTagData = await Tag.findAll({ 
+//       include: [{ model: Product, through: ProductTag}],
 //     });
-
-//     if (!categoryDestroy) {
-//       res.status(404).json({ message: 'No category found with this id!' });
-//       return;
-//     }
-
-//     res.status(200).json(categoryDestroy);
+//     const tagData = rawTagData.map((tag) => tag.get({plain: true}));
+//     res.statusCode(200).json(tagData);
 //   } catch (err) {
 //     res.status(500).json(err);
 //   }
 // });
+
+router.get('/:id', async(req, res) => {
+  try {
+      const tagId = await Tag.findByPk(req.params.id, {
+          include: [{ model: Product, through: ProductTag}],
+      });
+
+      if (!tagId) {
+          res.status(404).json({ message: 'None found!' });
+          return;
+      }
+      res.status(200).json(tagId);
+  } catch (err) {
+      res.status(500).json(err);
+  }
+});
+
+router.post('/', async (req, res) => {
+  // create a new tag
+  try {
+    const { tagName } = req.body;
+    await Tag.create({ tag_name: tagName});
+    res.status(200).json({message: "tag created successfully"});
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+router.put('/:id', async (req, res) => {
+  // update a tag's name by its `id` value
+  try {
+    const { tagName } = req.body;
+    const updatedTag = await Tag.update({ tag_name: tagName},
+       {where: {id: req.params.id}});
+       if (!updatedTag[0]) {
+        res.json(404).json({ message: "tag not found"});
+        return;
+       }
+       response.status(200).json({ message: "tag updated"});
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+
+router.delete('/:id', async (req, res) => {
+  // delete a category by its `id` value
+  try {
+    const deletedTag = await Tag.destroy(
+      {where: {id: req.params.id }}
+    );
+    if (!deletedTag) {
+      request.status(404).json({message: "nothing to delete"});
+    }
+    res.status(200).json({message: "Deleted successfully"});
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
 
 module.exports = router;
